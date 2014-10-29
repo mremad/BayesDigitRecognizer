@@ -27,21 +27,21 @@ void FileOutput::write_params_to_file(double** means, double* variances, double*
 	fout << num_classes << "\t: # of classes" << endl;
 	fout << num_dims << "\t: # dimension of observation vectors" << endl;
 	
-	for(int c=1; c<10; c++){ //classes
+	for(int c=0; c<num_classes; c++){ //classes
 		fout << c << "\t: class k=" << c << endl;
-		fout << p[c-1] << "\t: prior p(k=" << c << ")" << endl;
+		fout << priors[c] << "\t: prior p(k=" << c << ")" << endl;
 		
 		//print mean vector for class c
-		for(int d=0; d<256; d++)
+		for(int d=0; d<num_dims; d++)
 			fout << means[c][d] << " ";
 			
-		fout << "\t: mean vector mu_{k=" << c << "} = (0,0)" << endl;
+		fout << "\t: mean vector mu_{k=" << c << "}" << endl;
 		
 		//print co-variance vector for class c
-		for(int d=0; d<256; d++)
-			fout << cov_matrix[c][d] << " ";
+		for(int d=0; d<num_dims; d++)
+			fout << variances[d] << " ";
 			
-		fout << "\t: vector of variances sigma^2_{k=" << c << "} = (1 1)" << endl;
+		fout << "\t: vector of variances sigma^2_{k=" << c << "}" << endl;
  	}
 	
 	fout.close();
