@@ -28,7 +28,7 @@ int main(int argc, const char * argv[]) {
     bc.estimate_cov_matrix();
     
     FileOutput fo = FileOutput("/Users/Mohamed/Documents/BayesDigitRecognizer/BayesDigitRecognizer/usps.outputparams");
-    fo.write_params_to_file(bc.mean_values, bc.variance_values, bc.covariance_matrix, fr.num_dim, fr.num_labels);
+    fo.write_params_to_file(bc.mean_values, bc.variance_values, bc.covariance_matrix, bc.priors, fr.num_dim, fr.num_labels);
     
     BayesClassifier classifier = BayesClassifier(fr.num_labels);
     classifier.process_test_data(bc, "/Users/Mohamed/Documents/BayesDigitRecognizer/BayesDigitRecognizer/usps.test");

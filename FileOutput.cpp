@@ -13,7 +13,7 @@ FileOutput::FileOutput(string path)
     this->path = path;
 }
 
-void FileOutput::write_params_to_file(double** means, double* variances, double** cov_matrix, int num_dims, int num_classes)
+void FileOutput::write_params_to_file(double** means, double* variances, double** cov_matrix,double* priors, int num_dims, int num_classes)
 {
     //Assume dummy data for means, variances and cov_matrix
     //Assume num_dims = 256
