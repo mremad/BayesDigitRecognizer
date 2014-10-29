@@ -20,14 +20,9 @@ int BayesClassifier::classify_single_image(BayesEstimators estimator, int* img)
     return 0;
 }
 
-void BayesClassifier::load_test_data(string path)
-{
-    //Load the test images from usps.test into the arrays
-}
 
-void BayesClassifier::process_test_data(BayesEstimators estimators, string path)
+void BayesClassifier::process_test_data(BayesEstimators estimators, int** test_imgs, int* test_labels, int num_test_imgs)
 {
-    //1. Load test images
     
     //2. Classify images using bayes estimators
     

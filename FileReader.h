@@ -10,8 +10,9 @@ class FileReader
 {
     
     string path;
+    string test_path;
 public:
-    FileReader(string path);
+    FileReader(string path, string test_path);
     //2D array of all the dimensions of all the images. Size: (NxD)
     int** image_vectors;
     
@@ -27,7 +28,15 @@ public:
     //Number of observations
     int num_imgs;
     
+    
+    int num_test_imgs;
+    
+    int* test_labels;
+    
+    int** test_imgs;
+    
     void read_files();
+    void read_test_files();
     void deallocate();
     
 };

@@ -1,9 +1,10 @@
 #include "FileReader.h"
 #include <sstream>
 using namespace std;
-FileReader::FileReader(string document_path)
+FileReader::FileReader(string document_path, string test_data_path)
 {
     path=document_path;
+    test_path = test_data_path;
 }
 
 
@@ -85,4 +86,76 @@ void FileReader::read_files()
     
     else printf("Unable to open file\n");
 }
+
+void FileReader::read_test_files()
+{
+    num_test_imgs = 2007;
+    
+    int imgs_read = -1;
+    int img_width = 0;
+    
+    string line;
+    test_imgs = (int**)malloc(sizeof(int*)*num_test_imgs);
+    test_labels = (int*) malloc(sizeof(int)*num_test_imgs);
+    
+    ifstream myfile (test_path);
+    if (myfile.is_open())
+    {
+        int i=0;
+        while ( getline (myfile,line))
+        {
+            stringstream ssin(line);
+            
+            if( i == 0 )
+            {
+                
+                ssin >> num_labels;
+                
+                i++;
+                continue;
+            }
+            
+            if( i == 1)
+            {
+                
+                ssin >> num_dim;
+                
+                
+                i++;
+                continue;
+            }
+            
+            if(line.size() < 10)
+            {
+                imgs_read++;
+                
+                ssin >> test_labels[imgs_read];
+                
+                test_imgs[imgs_read] = (int*)malloc(sizeof(int)*num_dim);
+                img_width = 0;
+                
+                continue;
+            }
+            
+            int width = 0;
+            while (ssin.good() && width < 16)
+            {
+                ssin >> test_imgs[imgs_read][img_width];
+                
+                ++width;
+                ++img_width;
+            }
+            
+            i++;
+            //printf("%s\n",line.c_str());
+            
+        }
+        myfile.close();
+        printf("%d images read successfully\n",imgs_read+1);
+        
+    }
+    
+    else printf("Unable to open file\n");
+}
+
 
