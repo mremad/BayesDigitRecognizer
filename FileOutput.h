@@ -22,7 +22,7 @@ public:
     FileOutput(string path);
     
     
-    void write_params_to_file(double** means, double* vars, double** cov_matrix, int num_dims, int num_classes);
+    void write_params_to_file(double** means, double* vars, double** cov_matrix,double* priors, int num_dims, int num_classes);
     void deallocate();
     
 };
