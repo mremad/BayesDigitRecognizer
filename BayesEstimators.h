@@ -17,16 +17,19 @@
 using namespace std;
 class BayesEstimators
 {
+
+    
+    //Number of observations for each class Nk (Kx1);
+    int* observations_per_class;
+    
+public:
+    
     int num_obs;
     int** observations;
     int* observation_labels;
     int num_classes;
     int num_dim;
     
-    //Number of observations for each class Nk (Kx1);
-    int* observations_per_class;
-    
-public:
     BayesEstimators(int** observations, int* observation_labels, int num_classes, int num_dims, int num_obs);
     
     //2D array of all the means of all the dimensions for each class (DxK)

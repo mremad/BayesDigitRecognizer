@@ -26,13 +26,19 @@ BayesEstimators::BayesEstimators(int** obs, int* obs_labels, int classes, int di
     }
     
     priors = (double*)malloc(sizeof(double)*num_classes);
+    for(int i = 0 ; i < num_dim;i++)
+        priors[i] = 0;
     
     variance_values = (double*)malloc(sizeof(double)*num_dim);
+    for(int i = 0 ; i < num_dim;i++)
+        variance_values[i] = 0;
     
     covariance_matrix = (double**)malloc(sizeof(double*)*num_dim);
     for(int i = 0;i < num_dim;i++)
     {
         covariance_matrix[i] = (double*)malloc(sizeof(double)*num_dim);
+        for(int j = 0 ; j < num_dim;j++)
+            covariance_matrix[i][j] = 0;
     }
 }
 

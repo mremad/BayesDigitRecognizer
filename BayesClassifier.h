@@ -25,7 +25,7 @@ public:
     
     BayesClassifier(int num_classes);
     
-    int classify_single_image(BayesEstimators estimator, int* img);
+    int classify_single_image(BayesEstimators estimator, int* img,double* class_constants);
     void process_test_data(BayesEstimators estimators, int** test_imgs, int* test_labels, int num_test_imgs);
 };
 
