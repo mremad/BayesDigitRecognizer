@@ -17,7 +17,7 @@ int main(int argc, const char * argv[]) {
     printf("Bayes Digit Classifier!\n");
     
     //Change path according to the configuration of the project
-    FileReader fr = FileReader("/Users/Mohamed/Documents/BayesDigitRecognizer/BayesDigitRecognizer/usps.train","/Users/Mohamed/Documents/BayesDigitRecognizer/BayesDigitRecognizer/usps.test");
+    FileReader fr = FileReader("/Users/Mohamed/Documents/BayesDigitRecognizer/BayesDigitRecognizer/usps.train","/Users/Mohamed/Documents/BayesDigitRecognizer/BayesDigitRecognizer/usps.test","/Users/Mohamed/Documents/BayesDigitRecognizer/BayesDigitRecognizer/usps.outputparams");
     fr.read_files();
     fr.read_test_files();
     
@@ -31,6 +31,8 @@ int main(int argc, const char * argv[]) {
     
     FileOutput fo = FileOutput("/Users/Mohamed/Documents/BayesDigitRecognizer/BayesDigitRecognizer/usps.outputparams");
     fo.write_params_to_file(bc.mean_values, bc.variance_values, bc.covariance_matrix, bc.priors, fr.num_dim, fr.num_labels);
+    
+    fr.read_param_file(bc);
     
     BayesClassifier classifier = BayesClassifier(fr.num_labels);
     classifier.process_test_data(bc, fr.test_imgs, fr.test_labels, fr.num_test_imgs);

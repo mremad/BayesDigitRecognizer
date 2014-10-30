@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include "BayesEstimators.h"
 
 using namespace std;
 class FileReader
@@ -11,8 +12,9 @@ class FileReader
     
     string path;
     string test_path;
+    string param_path;
 public:
-    FileReader(string path, string test_path);
+    FileReader(string path, string test_path, string param_path);
     //2D array of all the dimensions of all the images. Size: (NxD)
     int** image_vectors;
     
@@ -29,6 +31,7 @@ public:
     int num_imgs;
     
     
+    
     int num_test_imgs;
     
     int* test_labels;
@@ -37,6 +40,8 @@ public:
     
     void read_files();
     void read_test_files();
+    void read_param_file(BayesEstimators be);
+    
     void deallocate();
     
 };

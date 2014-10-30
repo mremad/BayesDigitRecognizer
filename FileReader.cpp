@@ -1,10 +1,11 @@
 #include "FileReader.h"
 #include <sstream>
 using namespace std;
-FileReader::FileReader(string document_path, string test_data_path)
+FileReader::FileReader(string document_path, string test_data_path,string params_path)
 {
     path=document_path;
     test_path = test_data_path;
+    param_path = params_path;
 }
 
 
@@ -152,6 +153,88 @@ void FileReader::read_test_files()
         }
         myfile.close();
         printf("%d images read successfully\n",imgs_read+1);
+        
+    }
+    
+    else printf("Unable to open file\n");
+}
+
+void FileReader::read_param_file(BayesEstimators be)
+{
+    
+    
+    string line;
+    int curr_class = -1;
+    int reading_index = 0;
+    
+    ifstream myfile (param_path);
+    if (myfile.is_open())
+    {
+        int i=0;
+        while ( getline (myfile,line))
+        {
+            stringstream ssin(line);
+            
+            if( i == 0 )
+            {
+                i++;
+                continue;
+            }
+            
+            if( i == 1)
+            {
+                
+                ssin >> num_labels;
+                
+                
+                i++;
+                continue;
+            }
+            
+            if(i == 2)
+            {
+                ssin >> num_dim;
+                
+                
+                i++;
+                continue;
+            }
+            
+            switch (reading_index)
+            {
+                case 0:
+                    ssin >> curr_class;
+                    reading_index++;
+                    break;
+                case 1:
+                    ssin >> be.priors[curr_class];
+                    reading_index++;
+                    break;
+                case 2:
+                    for(int k = 0;k<num_dim;k++)
+                    {
+                        ssin >> be.mean_values[curr_class][k];
+                    }
+                    reading_index++;
+                    break;
+                case 3:
+                    for(int k = 0;k<num_dim;k++)
+                    {
+                        ssin >> be.variance_values[k];
+                    }
+                    reading_index = 0;
+                    break;
+                default:
+                    break;
+            }
+            
+            
+            i++;
+            //printf("%s\n",line.c_str());
+            
+        }
+        myfile.close();
+        printf("Params read successfully\n");
         
     }
     
