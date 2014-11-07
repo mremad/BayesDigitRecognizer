@@ -55,7 +55,7 @@ int BayesClassifier::classify_single_image(BayesEstimators estimator, int* img, 
 {
     //Classify a single image and return the recognized digit
     
-    double max_posterior = -10000;
+    double max_posterior = -1000000;
     int chosen_class = -1;
     
     double* prec_img = (double*)malloc(estimator.num_dim*sizeof(double));
