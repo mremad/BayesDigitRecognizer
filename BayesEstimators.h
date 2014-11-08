@@ -50,6 +50,9 @@ public:
     //Prior probabilities for each class (Kx1)
     double* priors;
     
+    //Class specific covariance matrixes (KxDxD)
+    double *** class_cov;
+    
 
     //Bayes Parameters Estimators
     void estimate_means();

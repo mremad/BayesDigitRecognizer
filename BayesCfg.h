@@ -11,5 +11,7 @@
 
 #define POOLED_COV_MATRIX
 //#define POOLED_DIAG_COV_MATRIX
+//#define FULL_CLASS_COV_MATRIX
+//#define DIAG_CLASS_COV_MARTIX
 
 #endif

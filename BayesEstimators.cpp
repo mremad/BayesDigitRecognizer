@@ -42,11 +42,24 @@ BayesEstimators::BayesEstimators(int** obs, int* obs_labels, int classes, int di
         for(int j = 0 ; j < num_dim;j++)
             covariance_matrix[i][j] = 0;
     }
+    
+    class_cov = (double***)malloc(sizeof(double**)*num_classes);
+    
+    for(int k = 0;k<num_classes;k++)
+    {
+        class_cov[k] = (double**)malloc(sizeof(double*)*num_dim);
+        for(int i = 0;i < num_dim;i++)
+        {
+            class_cov[k][i] = (double*)malloc(sizeof(double)*num_dim);
+            for(int j = 0 ; j < num_dim;j++)
+                class_cov[k][i][j] = 0;
+        }
+    }
 }
 
+// b) iv)
 void BayesEstimators::estimate_pooled_diag_cov_matrix()
 {
-    //Write to cov_matrix
     
     for(int i = 0 ;i<num_dim;i++)
     {
@@ -60,6 +73,7 @@ void BayesEstimators::estimate_pooled_diag_cov_matrix()
     }
 }
 
+// b) iii)
 void BayesEstimators::estimate_pooled_cov_matrix()
 {
     Eigen::MatrixXf cov_mat(num_dim,num_dim);
@@ -80,9 +94,20 @@ void BayesEstimators::estimate_pooled_cov_matrix()
     
 }
 
+// b) ii)
 void BayesEstimators::estimate_diag_class_cov_matrix()
 {
+    // TO DO
     
+    //Fill class_cov with the appropriate covariances
+}
+
+// b) i)
+void estimate_full_cov_matrix()
+{
+    //TO DO
+    
+    //Fill class_cov with the appropriate covariances
 }
 
 void BayesEstimators::estimate_cov_matrix()
@@ -93,6 +118,14 @@ void BayesEstimators::estimate_cov_matrix()
     
 #ifdef POOLED_COV_MATRIX
     estimate_pooled_cov_matrix();
+#endif
+    
+#ifdef FULL_CLASS_COV_MATRIX
+    estimate_full_cov_matrix();
+#endif
+    
+#ifdef DIAG_CLASS_COV_MARTIX
+    estimate_diag_class_cov_matrix();
 #endif
 }
 
