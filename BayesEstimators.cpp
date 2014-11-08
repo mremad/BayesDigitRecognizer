@@ -8,6 +8,8 @@
 
 #include "BayesEstimators.h"
 #include "math.h"
+#include "MatrixOperations.h"
+#include "BayesCfg.h"
 
 BayesEstimators::BayesEstimators(int** obs, int* obs_labels, int classes, int dims, int num_observations)
 {
@@ -42,7 +44,7 @@ BayesEstimators::BayesEstimators(int** obs, int* obs_labels, int classes, int di
     }
 }
 
-void BayesEstimators::estimate_cov_matrix()
+void BayesEstimators::estimate_pooled_diag_cov_matrix()
 {
     //Write to cov_matrix
     
@@ -51,12 +53,50 @@ void BayesEstimators::estimate_cov_matrix()
         for(int j = 0 ; j < num_dim ; j++)
         {
             if(i == j)
-                covariance_matrix[i][j] = variance_values[i];
+                covariance_matrix[i][j] = 1/variance_values[i];
             else
                 covariance_matrix[i][j] = 0;
         }
     }
 }
+
+void BayesEstimators::estimate_pooled_cov_matrix()
+{
+    Eigen::MatrixXf cov_mat(num_dim,num_dim);
+    
+    for(int i = 0; i < num_obs;i++)
+    {
+        Eigen::VectorXf xn = MatrixOperations::transform_array_to_vector(num_dim, observations[i]);
+        Eigen::VectorXf uk = MatrixOperations::transform_array_to_vector(num_dim, mean_values[observation_labels[i]%10]);
+        
+        cov_mat += (xn - uk) * (xn - uk).transpose();
+    }
+    
+    cov_mat = cov_mat * (1/(num_obs*1.0));
+    
+    cov_mat = cov_mat.inverse();
+    
+    covariance_matrix = MatrixOperations::transform_matrix_to_array(num_dim, num_dim, cov_mat);
+    
+}
+
+void BayesEstimators::estimate_diag_class_cov_matrix()
+{
+    
+}
+
+void BayesEstimators::estimate_cov_matrix()
+{
+#ifdef POOLED_DIAG_COV_MATRIX
+    estimate_pooled_diag_cov_matrix();
+#endif
+    
+#ifdef POOLED_COV_MATRIX
+    estimate_pooled_cov_matrix();
+#endif
+}
+
+
 
 void BayesEstimators::estimate_means()
 {

@@ -48,3 +48,8 @@ void FileOutput::write_params_to_file(double** means, double* variances, double*
 	
     printf("Writing to file completed successfully!\n");
 }
+
+void FileOutput::write_covariance_to_file(double** cov_matrix, int num_dims, int num_classes)
+{
+    
+}

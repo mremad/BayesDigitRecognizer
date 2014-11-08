@@ -14,6 +14,7 @@
 #include <fstream>
 #include <string>
 
+
 using namespace std;
 class BayesEstimators
 {
@@ -21,6 +22,11 @@ class BayesEstimators
     
     //Number of observations for each class Nk (Kx1);
     int* observations_per_class;
+    
+    void estimate_full_cov_matrix();
+    void estimate_diag_class_cov_matrix();
+    void estimate_pooled_cov_matrix();
+    void estimate_pooled_diag_cov_matrix();
     
 public:
     

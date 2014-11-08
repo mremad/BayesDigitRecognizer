@@ -7,7 +7,7 @@
 //
 
 #include "BayesClassifier.h"
-#include "Eigen/Dense"
+#include "MatrixOperations.h"
 #include "math.h"
 
 BayesClassifier::BayesClassifier(int num_classes)
@@ -24,32 +24,6 @@ BayesClassifier::BayesClassifier(int num_classes)
     }
 }
 
-Eigen::MatrixXf transform_array_to_matrix(int width, int height, double ** matrix)
-{
-    Eigen::MatrixXf ret_mat(width,height);
-    
-    for(int i = 0;i<height;i++)
-    {
-        for(int j = 0;j<width;j++)
-        {
-            ret_mat(i,j) = matrix[i][j];
-        }
-    }
-    
-    return ret_mat;
-}
-
-Eigen::VectorXf transform_array_to_vector(int width, double* vector)
-{
-    Eigen::VectorXf ret_vec(width);
-    
-    for(int i = 0;i<width;i++)
-    {
-        ret_vec[i] = vector[i];
-    }
-    
-    return ret_vec;
-}
 
 int BayesClassifier::classify_single_image(BayesEstimators estimator, int* img, double* class_constants)
 {
@@ -64,15 +38,13 @@ int BayesClassifier::classify_single_image(BayesEstimators estimator, int* img, 
         prec_img[i] = img[i]*1.0;
     }
     
-    Eigen::VectorXf img_vec = transform_array_to_vector(estimator.num_dim, prec_img);
+    Eigen::VectorXf img_vec = MatrixOperations::transform_array_to_vector(estimator.num_dim, prec_img);
     Eigen::MatrixXf cov_matrix =
-    transform_array_to_matrix(estimator.num_dim, estimator.num_dim, estimator.covariance_matrix);
-    for(int j = 0; j<estimator.num_dim;j++)
-        cov_matrix(j,j) = 1/cov_matrix(j,j);
+    MatrixOperations::transform_array_to_matrix(estimator.num_dim, estimator.num_dim, estimator.covariance_matrix);
     
     for(int i = 0; i < estimator.num_classes;i++)
     {
-        Eigen::VectorXf mean_vec = transform_array_to_vector(estimator.num_dim, estimator.mean_values[i]);
+        Eigen::VectorXf mean_vec = MatrixOperations::transform_array_to_vector(estimator.num_dim, estimator.mean_values[i]);
 
         double posterior = class_constants[i] - ( 0.5*((img_vec - mean_vec).transpose()*cov_matrix)*(img_vec - mean_vec) );
         
@@ -95,18 +67,13 @@ void BayesClassifier::process_test_data(BayesEstimators estimators, int** test_i
     
     double* class_constants = (double*)malloc(sizeof(double)*estimators.num_classes);
     
-    Eigen::MatrixXf cov = transform_array_to_matrix(estimators.num_dim, estimators.num_dim, estimators.covariance_matrix);
-    double det_cov = 0;
-    for(int i = 0;i<estimators.num_dim;i++)
-    {
-        det_cov += log10f(cov(i,i));
-    }
+    Eigen::MatrixXf cov = MatrixOperations::transform_array_to_matrix(estimators.num_dim, estimators.num_dim, estimators.covariance_matrix);
     
     for(int i=0;i<estimators.num_classes;i++)
     {
 
         
-        double class_constant = log10f(estimators.priors[i]) - (0.5 * (det_cov + (estimators.num_dim*log10f(2 * M_PI))) );
+        double class_constant = log10f(estimators.priors[i]);
         class_constants[i] = class_constant;
     }
     printf("Classifying test data...\n");
