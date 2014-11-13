@@ -50,9 +50,15 @@ void FileOutput::write_params_to_file(double** means, double* variances, double*
 }
 
 // b)
-void FileOutput::write_covariance_to_file(double** cov_matrix, int num_dims, int num_classes)
+void FileOutput::write_covariance_to_file(double** cov_matrix, int num_dims, int num_classes, ofstream & output)
 {
-    // TO DO
-    
-    //Append the given covariance matrix to a file (usps.covariances)
+    output << "\n" <<endl;
+    for(int i = 0;i<num_dims;i++)
+    {
+        for(int j = 0;j<num_dims;j++)
+        {
+            output << cov_matrix[i][j]<< "\t";
+        }
+        output << endl;
+    }
 }

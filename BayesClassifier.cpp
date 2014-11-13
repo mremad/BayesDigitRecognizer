@@ -9,6 +9,7 @@
 #include "BayesClassifier.h"
 #include "MatrixOperations.h"
 #include "math.h"
+#include "BayesCfg.h"
 
 BayesClassifier::BayesClassifier(int num_classes)
 {
@@ -39,11 +40,36 @@ int BayesClassifier::classify_single_image(BayesEstimators estimator, int* img, 
     }
     
     Eigen::VectorXf img_vec = MatrixOperations::transform_array_to_vector(estimator.num_dim, prec_img);
+    
+#ifdef POOLED_COV_MATRIX
     Eigen::MatrixXf cov_matrix =
     MatrixOperations::transform_array_to_matrix(estimator.num_dim, estimator.num_dim, estimator.covariance_matrix);
+#endif
+    
+#ifdef POOLED_DIAG_COV_MATRIX
+    Eigen::MatrixXf cov_matrix =
+    MatrixOperations::transform_array_to_matrix(estimator.num_dim, estimator.num_dim, estimator.covariance_matrix);
+#endif
+    
     
     for(int i = 0; i < estimator.num_classes;i++)
     {
+        
+#ifdef FULL_CLASS_COV_MATRIX
+        Eigen::MatrixXf cov_matrix =
+        MatrixOperations::transform_array_to_matrix(estimator.num_dim, estimator.num_dim, estimator.class_cov[i]);
+#endif
+        
+#ifdef SMOOTHED_COV
+        Eigen::MatrixXf cov_matrix =
+        MatrixOperations::transform_array_to_matrix(estimator.num_dim, estimator.num_dim, estimator.class_cov[i]);
+#endif
+        
+#ifdef DIAG_CLASS_COV_MARTIX
+        Eigen::MatrixXf cov_matrix =
+        MatrixOperations::transform_array_to_matrix(estimator.num_dim, estimator.num_dim, estimator.class_cov[i]);
+#endif
+        
         Eigen::VectorXf mean_vec = MatrixOperations::transform_array_to_vector(estimator.num_dim, estimator.mean_values[i]);
 
         double posterior = class_constants[i] - ( 0.5*((img_vec - mean_vec).transpose()*cov_matrix)*(img_vec - mean_vec) );
@@ -67,12 +93,28 @@ void BayesClassifier::process_test_data(BayesEstimators estimators, int** test_i
     
     double* class_constants = (double*)malloc(sizeof(double)*estimators.num_classes);
     
-    Eigen::MatrixXf cov = MatrixOperations::transform_array_to_matrix(estimators.num_dim, estimators.num_dim, estimators.covariance_matrix);
+#ifdef POOLED_COV_MATRIX
+    estimators.calculate_pooled_cov_inverse();
+#endif
+    
+#ifdef POOLED_DIAG_COV_MATRIX
+    estimators.calculate_pooled_cov_inverse();
+#endif
+    
+#ifdef FULL_CLASS_COV_MATRIX
+    estimators.calculate_class_cov_inverse();
+#endif
+
+#ifdef SMOOTHED_COV
+    estimators.calculate_class_cov_inverse();
+#endif
+    
+#ifdef DIAG_CLASS_COV_MARTIX
+    estimators.calculate_class_cov_inverse();
+#endif
     
     for(int i=0;i<estimators.num_classes;i++)
     {
-
-        
         double class_constant = log10f(estimators.priors[i]);
         class_constants[i] = class_constant;
     }

@@ -23,10 +23,7 @@ class BayesEstimators
     //Number of observations for each class Nk (Kx1);
     int* observations_per_class;
     
-    void estimate_full_cov_matrix();
-    void estimate_diag_class_cov_matrix();
-    void estimate_pooled_cov_matrix();
-    void estimate_pooled_diag_cov_matrix();
+
     
 public:
     
@@ -59,6 +56,14 @@ public:
     void estimate_variances();
     void estimate_cov_matrix();
     void estimate_priors();
+    void smooth_covariances(double delta);
+    void calculate_pooled_cov_inverse();
+    void calculate_class_cov_inverse();
+    
+    void estimate_full_cov_matrix();
+    void estimate_diag_class_cov_matrix();
+    void estimate_pooled_cov_matrix();
+    void estimate_pooled_diag_cov_matrix();
     
     void deallocate();
     

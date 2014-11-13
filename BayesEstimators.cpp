@@ -57,6 +57,26 @@ BayesEstimators::BayesEstimators(int** obs, int* obs_labels, int classes, int di
     }
 }
 
+// d)
+void BayesEstimators::smooth_covariances(double delta)
+{
+    estimate_full_cov_matrix();
+    estimate_pooled_cov_matrix();
+    
+    Eigen::MatrixXf pooled_cov = MatrixOperations::transform_array_to_matrix(num_dim, num_dim, covariance_matrix);
+    
+    Eigen::MatrixXf *class_cov_mat = (Eigen::MatrixXf *)malloc(sizeof(Eigen::MatrixXf)*num_classes);
+    for(int i = 0;i<num_classes;i++)
+    {
+        class_cov_mat[i] = MatrixOperations::transform_array_to_matrix(num_dim, num_dim, class_cov[i]);
+        
+        class_cov_mat[i] = (delta * pooled_cov) + ( class_cov_mat[i] * (1-delta) );
+        
+        class_cov[i] = MatrixOperations::transform_matrix_to_array(num_dim, num_dim, class_cov_mat[i]);
+    }
+    
+}
+
 // b) iv)
 void BayesEstimators::estimate_pooled_diag_cov_matrix()
 {
@@ -66,7 +86,7 @@ void BayesEstimators::estimate_pooled_diag_cov_matrix()
         for(int j = 0 ; j < num_dim ; j++)
         {
             if(i == j)
-                covariance_matrix[i][j] = 1/variance_values[i];
+                covariance_matrix[i][j] = variance_values[i];
             else
                 covariance_matrix[i][j] = 0;
         }
@@ -88,8 +108,6 @@ void BayesEstimators::estimate_pooled_cov_matrix()
     
     cov_mat = cov_mat * (1/(num_obs*1.0));
     
-    cov_mat = cov_mat.inverse();
-    
     covariance_matrix = MatrixOperations::transform_matrix_to_array(num_dim, num_dim, cov_mat);
     
 }
@@ -97,17 +115,79 @@ void BayesEstimators::estimate_pooled_cov_matrix()
 // b) ii)
 void BayesEstimators::estimate_diag_class_cov_matrix()
 {
-    // TO DO
+    int *class_entries = (int*)malloc(sizeof(int)*num_classes);
     
-    //Fill class_cov with the appropriate covariances
+    for(int i = 0;i<num_classes;i++)
+        for(int j = 0;j<num_dim;j++)
+            for(int k = 0;k<num_dim;k++)
+                class_cov[i][j][k] = 0;
+    
+    for(int i = 0; i < num_obs;i++)
+    {
+        for(int j = 0;j < num_dim;j++)
+        {
+           class_cov[observation_labels[i]%10][j][j] += pow(observations[i][j] - mean_values[observation_labels[i]%10][j],2);
+        }
+        
+        class_entries[observation_labels[i]%10] ++;
+    }
+    
+    for(int i = 0;i < num_classes;i++)
+    {
+        for(int j = 0; j < num_dim; j++)
+        {
+            class_cov[i][j][j] = class_cov[i][j][j]/(class_entries[i]*1.0);
+        }
+    }
 }
 
 // b) i)
-void estimate_full_cov_matrix()
+void BayesEstimators::estimate_full_cov_matrix()
 {
-    //TO DO
+    Eigen::MatrixXf *class_cov_mat = (Eigen::MatrixXf *)malloc(sizeof(Eigen::MatrixXf)*num_classes);
+    for(int i = 0;i<num_classes;i++)
+        class_cov_mat[i] = Eigen::MatrixXf(num_dim,num_dim);
+    int *class_entries = (int*)malloc(sizeof(int)*num_classes);
     
-    //Fill class_cov with the appropriate covariances
+    for(int i = 0;i<num_classes;i++)
+        class_entries[i] = 0;
+    
+    for(int i = 0; i < num_obs;i++)
+    {
+        Eigen::VectorXf xn = MatrixOperations::transform_array_to_vector(num_dim, observations[i]);
+        
+        Eigen::VectorXf uk = MatrixOperations::transform_array_to_vector(num_dim, mean_values[observation_labels[i]%10]);
+        
+        class_cov_mat[observation_labels[i]%10] += (xn - uk) * (xn - uk).transpose();
+        class_entries[observation_labels[i]%10] ++;
+    }
+    
+    for(int i = 0;i < num_classes ;i ++)
+    {
+        class_cov_mat[i] = class_cov_mat[i] * (1/(class_entries[i]*1.0));
+        
+        class_cov[i] = MatrixOperations::transform_matrix_to_array(num_dim, num_dim, class_cov_mat[i]);
+    }
+    
+    
+}
+
+void BayesEstimators::calculate_pooled_cov_inverse()
+{
+    Eigen::MatrixXf pooled_cov = MatrixOperations::transform_array_to_matrix(num_dim, num_dim, covariance_matrix);
+    covariance_matrix = MatrixOperations::transform_matrix_to_array(num_dim, num_dim, pooled_cov.inverse());
+
+}
+
+void BayesEstimators::calculate_class_cov_inverse()
+{
+    Eigen::MatrixXf *class_cov_mat = (Eigen::MatrixXf *)malloc(sizeof(Eigen::MatrixXf)*num_classes);
+    for(int i = 0;i<num_classes;i++)
+    {
+        class_cov_mat[i] = MatrixOperations::transform_array_to_matrix(num_dim, num_dim, class_cov[i]);
+        
+        class_cov[i] = MatrixOperations::transform_matrix_to_array(num_dim, num_dim, class_cov_mat[i].inverse());
+    }
 }
 
 void BayesEstimators::estimate_cov_matrix()
@@ -126,6 +206,10 @@ void BayesEstimators::estimate_cov_matrix()
     
 #ifdef DIAG_CLASS_COV_MARTIX
     estimate_diag_class_cov_matrix();
+#endif
+    
+#ifdef SMOOTHED_COV
+    smooth_covariances(DELTA);
 #endif
 }
 
